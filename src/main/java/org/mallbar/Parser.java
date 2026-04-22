@@ -1,48 +1,45 @@
+package org.mallbar;
 
-package org.example;
-
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
-import org.example.cookiesAndStorage.CookieAndStorage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
+import org.mallbar.pages.PriceAndDiscountPage;
+import org.mallbar.session.SessionManager;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
-
 import java.util.regex.Pattern;
 
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
+import static com.codeborne.selenide.Selenide.executeJavaScript;
+import static com.codeborne.selenide.Selenide.open;
+import static org.mallbar.pages.PriceAndDiscountPage.ARTICLE_COLUMN;
+import static org.mallbar.pages.PriceAndDiscountPage.PERCENT_COLUMN;
 
-public class PriceAndDiscountPage {
 
-    private static final SelenideElement mainTable = $(By.xpath("//*[contains(@class, 'ant-table-tbody-virtual-holder-inner')]"));
-    private static final SelenideElement spinContainer = $(By.xpath("//*[contains(@class, 'ant-table-tbody-virtual-holder')]"));
+public class Parser {
     private static final Pattern ARTICLE_PATTERN = Pattern.compile("\\d{8,}");
     private static final Map<String, String> articleAndDiscountMap = new HashMap<>();
-    private static final String TARGET_URL = "https://seller.wildberries.ru/discount-and-prices/main-table";
-    private static final String ARTICLE_COLUMN = "./div[1]";
-    private static final String PERCENT_COLUMN = "./div[7]";
 
-    public PriceAndDiscountPage() {
+    public Parser() {
+        Configuration.browserSize = "1920х1080";
         System.setProperty("chromeoptions.args", "--force-device-scale-factor=0.33");
-        CookieAndStorage cookieAndStorage = new CookieAndStorage();
-        cookieAndStorage.setCookieAndStorage();
+        SessionManager sessionManager = new SessionManager();
+        sessionManager.setCookieAndStorage();
     }
 
-    public Map<String, String> parseArticleAndSpp() {
-        open(TARGET_URL);
-        getWebDriver().manage().window().maximize();
-        mainTable.shouldBe(visible, Duration.ofSeconds(10));
+    public Map<String, String> parseArticleAndDiscount() {
+        PriceAndDiscountPage priceAndDiscountPage = new PriceAndDiscountPage();
+        open(PriceAndDiscountPage.PAGE_URL);
+        priceAndDiscountPage.getMainTable().shouldBe(visible, Duration.ofSeconds(10));
         int articleAndDiscountMapSize = 0;
         executeJavaScript("window.scrollBy(0, 1500)");
         while (true) {
             try {
-                for (SelenideElement el : mainTable.$$x("./*")) {
+                for (SelenideElement el : priceAndDiscountPage.getMainTable().$$x("./*")) {
                     SelenideElement nameCell = el.$x(ARTICLE_COLUMN);
                     SelenideElement percentCell = el.$x(PERCENT_COLUMN);
                     if (!el.getText().isEmpty() && Arrays.asList(el.getText().split("\n")).size() > 12) {
@@ -55,10 +52,10 @@ public class PriceAndDiscountPage {
                 }
                 if (articleAndDiscountMapSize == articleAndDiscountMap.size()) break;
                 articleAndDiscountMapSize = articleAndDiscountMap.size();
-                executeJavaScript("arguments[0].scrollTop += 1500;", spinContainer);
-                sleep(1000);
-            } catch (MoveTargetOutOfBoundsException ex) {
-                System.out.println("упс");
+                priceAndDiscountPage.spinPriceAndDiscountTable(1500);
+                Selenide.sleep(1000);
+            } catch (Exception ex) {
+                System.out.println("Произошла ошибка при парсинге: \n" + ex);
             }
         }
         return articleAndDiscountMap;

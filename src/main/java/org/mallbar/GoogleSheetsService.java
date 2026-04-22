@@ -1,4 +1,4 @@
-package org.example.cookiesAndStorage;
+package org.mallbar;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -11,24 +11,24 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.ToString;
 
 import java.io.FileInputStream;
 import java.util.*;
 
 @Getter
+@ToString
 public class GoogleSheetsService {
 
     private static final String SPREADSHEET_ID = "1mVWGX2F2JIbrbUoSh2tEeniUFhiq6WdHrHMoG6dRDdE";
     private static Sheets service = null;
     private final String sheetName;
-    private final String articleColumn;
 
 
     @SneakyThrows
-    public GoogleSheetsService(String sheetName, String articleColumn) {
+    public GoogleSheetsService(String sheetName) {
         this.sheetName = sheetName;
-        this.articleColumn = articleColumn;
-        FileInputStream credentialsStream = new FileInputStream("src/main/resources/credentials.json");
+        FileInputStream credentialsStream = new FileInputStream("src\\main\\resources\\credentials.json");
         GoogleCredentials credentials = ServiceAccountCredentials.fromStream(credentialsStream)
                 .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
         service = new Sheets.Builder(
