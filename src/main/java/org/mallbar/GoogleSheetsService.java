@@ -1,6 +1,7 @@
 package org.mallbar;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
@@ -21,27 +22,34 @@ import java.util.*;
 public class GoogleSheetsService {
 
     private static final String SPREADSHEET_ID = "1mVWGX2F2JIbrbUoSh2tEeniUFhiq6WdHrHMoG6dRDdE";
-    private static Sheets service = null;
+    private final Sheets service;
+    private final String searchColumn;
+    private final String updateColumn;
     private final String sheetName;
+
+    //WB unit БАЗА
 
 
     @SneakyThrows
-    public GoogleSheetsService(String sheetName) {
+    public GoogleSheetsService(String sheetName, String searchColumn, String updateColumn) {
+        this.searchColumn = searchColumn;
+        this.updateColumn = updateColumn;
         this.sheetName = sheetName;
         FileInputStream credentialsStream = new FileInputStream("src\\main\\resources\\credentials.json");
         GoogleCredentials credentials = ServiceAccountCredentials.fromStream(credentialsStream)
                 .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
-        service = new Sheets.Builder(
+        this.service = new Sheets.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 GsonFactory.getDefaultInstance(),
                 new HttpCredentialsAdapter(credentials))
                 .setApplicationName("WB Parser")
                 .build();
+
     }
 
     @SneakyThrows
-    public void updatePercent(Map<String, String> dataToUpdate, String columnFroSearch, String columnForUpdate) {
-        Map<String, Integer> articleAndPosition = getValuesFromColumn(columnFroSearch);
+    public boolean updateColumn(Map<String, String> dataToUpdate) {
+        Map<String, Integer> articleAndPosition = getValuesFromColumn(this.searchColumn);
         List<ValueRange> updateList = new ArrayList<>();
         for (Map.Entry<String, String> entry : dataToUpdate.entrySet()) {
             String article = entry.getKey();
@@ -49,46 +57,55 @@ public class GoogleSheetsService {
             if (articleAndPosition.containsKey(article)) {
                 int rowIndex = articleAndPosition.get(article);
                 updateList.add(new ValueRange()
-                        .setRange("'WB unit БАЗА'!" + columnForUpdate + rowIndex)
+                        .setRange(this.sheetName + "!" + this.updateColumn + rowIndex)
                         .setValues(Collections.singletonList(Collections.singletonList(newValue))));
             }
         }
         System.out.println(updateList);
         if (updateList.isEmpty()) {
             System.out.println("Нет данных для обновления.");
-            return;
+            return false;
         }
-        batchUpdateColumn(updateList);
+        return batchUpdateColumn(updateList);
     }
 
     @SneakyThrows
-    private Map<String, Integer> getValuesFromColumn(String column) {
-        String rangeForValues = "'" + sheetName + "'!" + column + ":" + column;
-        ValueRange response = service.spreadsheets().values()
-                .get(SPREADSHEET_ID, rangeForValues)
-                .execute();
-
-        List<List<Object>> values = response.getValues();
+    private Map<String, Integer> getValuesFromColumn(String searchColumn) {
+        String rangeForValues = "'" + this.sheetName + "'!" + searchColumn + ":" + searchColumn;
         Map<String, Integer> articlesAndPosition = new HashMap<>();
-        if (values != null) {
-            for (int i = 0; i < values.size(); i++) {
-                if (!values.get(i).isEmpty()) {
-                    articlesAndPosition.put(values.get(i).get(0).toString().trim(), i + 1);
+        try {
+            ValueRange response = service.spreadsheets().values()
+                    .get(SPREADSHEET_ID, rangeForValues)
+                    .execute();
+            List<List<Object>> values = response.getValues();
+            if (values != null) {
+                for (int i = 0; i < values.size(); i++) {
+                    if (!values.get(i).isEmpty()) {
+                        articlesAndPosition.put(values.get(i).get(0).toString().trim(), i + 1);
+                    }
                 }
             }
+        } catch (GoogleJsonResponseException ex) {
+            System.out.println("Не удалось получить данные из таблицы " + searchColumn + "\n" + ex);
+            return Map.of();
         }
         return articlesAndPosition;
     }
 
 
     @SneakyThrows
-    private void batchUpdateColumn(List<ValueRange> updateList) {
-        BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
-                .setValueInputOption("USER_ENTERED")
-                .setData(updateList);
-        service.spreadsheets().values()
-                .batchUpdate(SPREADSHEET_ID, batchBody)
-                .execute();
-        System.out.println("✅ Успешно обновлено " + updateList.size() + " позиций одним запросом!");
+    private boolean batchUpdateColumn(List<ValueRange> updateList) {
+        try {
+            BatchUpdateValuesRequest batchBody = new BatchUpdateValuesRequest()
+                    .setValueInputOption("USER_ENTERED")
+                    .setData(updateList);
+            service.spreadsheets().values()
+                    .batchUpdate(SPREADSHEET_ID, batchBody)
+                    .execute();
+        } catch (GoogleJsonResponseException ex) {
+            System.out.println("Не удалось обновить данные " + updateList + '\n' + ex);
+            return false;
+        }
+        return true;
     }
 }

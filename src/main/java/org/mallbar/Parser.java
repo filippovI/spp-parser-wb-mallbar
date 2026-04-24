@@ -22,7 +22,7 @@ import static org.mallbar.pages.PriceAndDiscountPage.PERCENT_COLUMN;
 
 public class Parser {
     private static final Pattern ARTICLE_PATTERN = Pattern.compile("\\d{8,}");
-    private static final Map<String, String> articleAndDiscountMap = new HashMap<>();
+    private final Map<String, String> articleAndDiscountMap = new HashMap<>();
 
     public Parser() {
         Configuration.browserSize = "1920х1080";
@@ -56,6 +56,7 @@ public class Parser {
                 Selenide.sleep(1000);
             } catch (Exception ex) {
                 System.out.println("Произошла ошибка при парсинге: \n" + ex);
+                return Map.of();
             }
         }
         return articleAndDiscountMap;

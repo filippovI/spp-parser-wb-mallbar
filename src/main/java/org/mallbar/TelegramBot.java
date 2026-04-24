@@ -7,10 +7,12 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import java.util.Map;
+
 public class TelegramBot extends TelegramLongPollingBot {
     private final String botUsername = "Mallbar WB";
     private final String botToken = "8513691300:AAEGP1RhZBK-p0To4ctdVtyYgZ07qWAJtdE";
-    private final String adminChatId = "";
+    private final String adminChatId = "467744617";
 
     public static TelegramBot init() {
         try {
@@ -40,8 +42,27 @@ public class TelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
             if (messageText.equals("/start")) {
-                sendTextMessage(chatId, "Привет!\n" + update.getMessage().getChatId());
+                sendTextMessage(chatId, "Привет!\nДля начала работы выбери один из пунктов в меню");
             }
+            if (messageText.equals("/updatespp")) {
+                sendTextMessage(chatId, "Запускаю обновление СПП");
+                Parser parser = new Parser();
+                GoogleSheetsService googleService = new GoogleSheetsService("WB Unit БАЗА", "A", "BH");
+                sendTextMessage(chatId, "Собираю данные");
+                Map<String, String> parseData = parser.parseArticleAndDiscount();
+                if (parseData.isEmpty()) {
+                    sendTextMessage(chatId, "Не удалось собрать данные");
+                } else {
+                    sendTextMessage(chatId, "Обновляю таблицу");
+                    boolean updateStatus = googleService.updateColumn(parseData);
+                    if (updateStatus) {
+                        sendTextMessage(chatId, "Данные успешно обновлены!");
+                    } else {
+                        sendTextMessage(chatId, "Не удалось обновить данные");
+                    }
+                }
+            }
+
         }
     }
 
