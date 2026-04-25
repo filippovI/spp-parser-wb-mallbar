@@ -1,4 +1,4 @@
-package org.mallbar;
+package org.mallbar.services;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -10,23 +10,28 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 
 @Getter
 @ToString
-public class TelegramBot extends TelegramLongPollingBot {
+public class TelegramBotService extends TelegramLongPollingBot {
+    private final Map<Long, CompletableFuture<String>> waitingResponses = new ConcurrentHashMap<>();
     private final String botUsername = "Mallbar WB";
     private final String botToken = "8513691300:AAEGP1RhZBK-p0To4ctdVtyYgZ07qWAJtdE";
     private final String adminChatId = "467744617";
 
-    public static TelegramBot init() {
+    public static TelegramBotService init() {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            TelegramBot bot = new TelegramBot();
+            TelegramBotService bot = new TelegramBotService();
             botsApi.registerBot(bot);
             System.out.println("Телеграм бот запущен");
             return bot;
         } catch (TelegramApiException ex) {
-            throw new RuntimeException("Ошибка при запуске телеграм бота\n" + ex);
+            throw new RuntimeException("Ошибка при запуске телеграм бота: " + ex.getMessage());
         }
     }
 
@@ -35,26 +40,20 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
+            if (waitingResponses.containsKey(chatId)) {
+                CompletableFuture<String> future = waitingResponses.get(chatId);
+                future.complete(messageText); // "Размораживаем" парсер и передаем ему текст
+                waitingResponses.remove(chatId); // Удаляем из ожидания
+                return; // Выходим, чтобы не обрабатывать это как команду
+            }
             if (messageText.equals("/start")) {
                 sendTextMessage(chatId, "Привет!\nДля начала работы выбери один из пунктов в меню");
             }
             if (messageText.equals("/updatespp")) {
-                sendTextMessage(chatId, "Запускаю обновление СПП");
-                Parser parser = new Parser();
-                GoogleSheetsService googleService = new GoogleSheetsService("WB Unit БАЗА", "A", "BH");
-                sendTextMessage(chatId, "Собираю данные");
-                Map<String, String> parseData = parser.parseArticleAndDiscount();
-                if (parseData.isEmpty()) {
-                    sendTextMessage(chatId, "Не удалось собрать данные");
-                } else {
-                    sendTextMessage(chatId, "Обновляю таблицу");
-                    boolean updateStatus = googleService.updateColumn(parseData);
-                    if (updateStatus) {
-                        sendTextMessage(chatId, "Данные успешно обновлены!");
-                    } else {
-                        sendTextMessage(chatId, "Не удалось обновить данные");
-                    }
-                }
+                new Thread(() -> {
+                    ParserService parser = new ParserService(this);
+                    parser.parseDataAndUpdateColumn(chatId);
+                }).start();
             }
 
         }
@@ -68,6 +67,19 @@ public class TelegramBot extends TelegramLongPollingBot {
             execute(message);
         } catch (TelegramApiException ex) {
             System.out.println("Ошибка при отправке сообщения в телеграм бот\n" + ex);
+        }
+    }
+
+
+    public String waitForUserResponse(long chatId, String text) {
+        sendTextMessage(chatId, text);
+        CompletableFuture<String> future = new CompletableFuture<>();
+        waitingResponses.put(chatId, future);
+        try {
+            return future.get(2, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            waitingResponses.remove(chatId);
+            return null;
         }
     }
 }

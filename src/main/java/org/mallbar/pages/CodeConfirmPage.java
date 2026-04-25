@@ -12,10 +12,12 @@ import static com.codeborne.selenide.Selenide.actions;
 @Getter
 @ToString
 public class CodeConfirmPage {
-    SelenideElement writeSmsCodeLabel = $(By.xpath("//span[contains(text(), 'Введите код')]"));
-    SelenideElement firstUnputCode = $(By.xpath("//div[@class='FormCodeInput']//li[1]"));
+    public static final String ERROR_SMS_CODE_LABEL = "//span[contains(text(), 'Неверный код')]";
+    public final SelenideElement writeSmsCodeLabel = $(By.xpath("//span[contains(text(), 'Введите код')]"));
+    public final SelenideElement errorSmsCodeLabel = $(By.xpath(ERROR_SMS_CODE_LABEL));
+    public final SelenideElement firstUnputCode = $(By.xpath("//div[@class='FormCodeInput']//li[1]"));
 
-    public CodeConfirmPage writeSmsCode(String code) throws InterruptedException {
+    public CodeConfirmPage writeSmsCode(String code) {
         firstUnputCode.click();
         for (char digit : code.toCharArray()) {
             actions().sendKeys(String.valueOf(digit)).perform();

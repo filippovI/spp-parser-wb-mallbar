@@ -1,4 +1,4 @@
-package org.mallbar;
+package org.mallbar.services;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -86,6 +86,7 @@ public class GoogleSheetsService {
                 }
             }
         } catch (GoogleJsonResponseException ex) {
+            //log
             System.out.println("Не удалось получить данные из таблицы " + searchColumn + "\n" + ex);
             return Map.of();
         }
@@ -103,6 +104,7 @@ public class GoogleSheetsService {
                     .batchUpdate(SPREADSHEET_ID, batchBody)
                     .execute();
         } catch (GoogleJsonResponseException ex) {
+            //log
             System.out.println("Не удалось обновить данные " + updateList + '\n' + ex);
             return false;
         }

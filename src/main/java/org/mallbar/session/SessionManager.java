@@ -20,7 +20,7 @@ import java.util.Set;
 public class SessionManager {
     private static final String COOKIES_FILE = "src\\main\\java\\org\\mallbar\\session\\wb_seller_cookies.json";
     private static final String STORAGE_FILE = "src\\main\\java\\org\\mallbar\\session\\wb_local_storage.json";
-    private static final String SESSION_URL = "https://seller.wildberries.ru/";
+    public static final String SESSION_URL = "https://seller.wildberries.ru/";
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void saveCookieAndStorage() {
