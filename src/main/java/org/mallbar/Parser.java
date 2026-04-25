@@ -1,10 +1,10 @@
 package org.mallbar;
 
-import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
+import lombok.Getter;
+import lombok.ToString;
 import org.mallbar.pages.PriceAndDiscountPage;
-import org.mallbar.session.SessionManager;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -19,17 +19,17 @@ import static com.codeborne.selenide.Selenide.open;
 import static org.mallbar.pages.PriceAndDiscountPage.ARTICLE_COLUMN;
 import static org.mallbar.pages.PriceAndDiscountPage.PERCENT_COLUMN;
 
-
+@Getter
+@ToString
 public class Parser {
     private static final Pattern ARTICLE_PATTERN = Pattern.compile("\\d{8,}");
     private final Map<String, String> articleAndDiscountMap = new HashMap<>();
 
-    public Parser() {
-        Configuration.browserSize = "1920х1080";
-        System.setProperty("chromeoptions.args", "--force-device-scale-factor=0.33");
-        SessionManager sessionManager = new SessionManager();
-        sessionManager.setCookieAndStorage();
+    public boolean authViaSessionFiles() {
+        AuthService authService = new AuthService();
+        return authService.setCookieAndStorageWithRetry(3);
     }
+
 
     public Map<String, String> parseArticleAndDiscount() {
         PriceAndDiscountPage priceAndDiscountPage = new PriceAndDiscountPage();

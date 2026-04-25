@@ -1,5 +1,7 @@
 package org.mallbar;
 
+import lombok.Getter;
+import lombok.ToString;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,6 +11,8 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.util.Map;
 
+@Getter
+@ToString
 public class TelegramBot extends TelegramLongPollingBot {
     private final String botUsername = "Mallbar WB";
     private final String botToken = "8513691300:AAEGP1RhZBK-p0To4ctdVtyYgZ07qWAJtdE";
@@ -24,16 +28,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         } catch (TelegramApiException ex) {
             throw new RuntimeException("Ошибка при запуске телеграм бота\n" + ex);
         }
-    }
-
-    @Override
-    public String getBotToken() {
-        return botToken;
-    }
-
-    @Override
-    public String getBotUsername() {
-        return botUsername;
     }
 
     @Override
