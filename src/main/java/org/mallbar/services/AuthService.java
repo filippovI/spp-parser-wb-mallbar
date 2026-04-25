@@ -41,6 +41,7 @@ public class AuthService {
                 sessionManager.saveCookieAndStorage();
                 return true;
             } else if (codeConfirmPage.errorSmsCodeLabel.isDisplayed()) {
+                bot.sendTextMessage(chatId, "Неверный код");
                 System.out.println("Неверный код. Повторите снова: ");
             }
         }

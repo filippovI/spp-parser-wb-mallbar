@@ -92,14 +92,15 @@ public class ParserService {
 
     public void parseDataAndUpdateColumn(long chatId) {
         Map<String, String> parseData = parseData(chatId);
-        boolean updateState = updateColumn(chatId, parseData);
-        if (updateState) {
-            //log
-            System.out.println("Таблица обновлена");
-            bot.sendTextMessage(chatId, "Таблица обновлена");
-        }
-        else {
-            bot.sendTextMessage(chatId, "Ошибка при обновлении таблицы");
+        if (!parseData.isEmpty()) {
+            boolean updateState;
+            updateState = updateColumn(chatId, parseData);
+            if (updateState) {
+                System.out.println("Таблица обновлена");
+                bot.sendTextMessage(chatId, "Таблица обновлена");
+            } else {
+                bot.sendTextMessage(chatId, "Ошибка при обновлении таблицы");
+            }
         }
     }
 }
