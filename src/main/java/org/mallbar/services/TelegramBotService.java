@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TelegramBotService extends TelegramLongPollingBot {
     private final Map<Long, CompletableFuture<String>> waitingResponses = new ConcurrentHashMap<>();
     private final String botUsername = "Mallbar WB";
-    private final String botToken = "8513691300:AAEGP1RhZBK-p0To4ctdVtyYgZ07qWAJtdE";
+    private final String botToken = System.getenv("TELEGRAM_TOKEN");
     private final String adminChatId = "467744617";
     private final AtomicBoolean isParserRunning = new AtomicBoolean(false);
 
