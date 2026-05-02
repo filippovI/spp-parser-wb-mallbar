@@ -26,8 +26,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ DOCKER_HUB.DOCKERHUB_USERNAME }}
-          password: ${{ DOCKER_HUB.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_HUB.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB.DOCKERHUB_TOKEN }}
 
       - name: Extract project version
         id: meta
