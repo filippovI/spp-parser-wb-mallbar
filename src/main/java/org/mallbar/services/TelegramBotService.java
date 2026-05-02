@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @Getter
@@ -22,6 +23,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private final String botUsername = "Mallbar WB";
     private final String botToken = "8513691300:AAEGP1RhZBK-p0To4ctdVtyYgZ07qWAJtdE";
     private final String adminChatId = "467744617";
+    private final AtomicBoolean isParserRunning = new AtomicBoolean(false);
 
     public static TelegramBotService init() {
         try {
@@ -49,13 +51,23 @@ public class TelegramBotService extends TelegramLongPollingBot {
             if (messageText.equals("/start")) {
                 sendTextMessage(chatId, "Привет!\nДля начала работы выбери один из пунктов в меню");
             }
-            if (messageText.equals("/updatespp")) {
-                new Thread(() -> {
-                    ParserService parser = new ParserService(this);
-                    parser.parseDataAndUpdateColumn(chatId);
-                }).start();
-            }
 
+            if (messageText.equals("/updatespp")) {
+                if (isParserRunning.compareAndSet(false, true)) {
+                    new Thread(() -> {
+                        try {
+                            ParserService parser = new ParserService(this);
+                            parser.parseDataAndUpdateColumn(chatId);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        } finally {
+                            isParserRunning.set(false);
+                        }
+                    }).start();
+                } else {
+                    sendTextMessage(chatId, "Обновление уже запущено");
+                }
+            }
         }
     }
 
