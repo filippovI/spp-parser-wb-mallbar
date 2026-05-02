@@ -15,32 +15,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.codeborne.selenide.Selenide.open;
-import static com.codeborne.selenide.Selenide.refresh;
-
 @Getter
 @ToString
 public class SessionManager {
     private static final String COOKIES_FILE = "src\\main\\java\\org\\mallbar\\session\\wb_seller_cookies.json";
     private static final String STORAGE_FILE = "src\\main\\java\\org\\mallbar\\session\\wb_local_storage.json";
-    private static final String SESSION_URL = "https://seller.wildberries.ru/";
+    public static final String SESSION_URL = "https://seller.wildberries.ru/";
     private final ObjectMapper mapper = new ObjectMapper();
-
-    public void setCookieAndStorage() {
-        open(SESSION_URL);
-        loadCookies();
-        loadLocalStorage();
-        refresh();
-    }
 
     public void saveCookieAndStorage() {
         saveCookies();
         saveLocalStorage();
     }
 
-    private void loadCookies() {
+    public SessionManager setCookies() {
         File file = new File(COOKIES_FILE);
-        if (!file.exists()) return;
+        if (!file.exists()) return this;
         try {
             List<Map<String, Object>> cookiesData = mapper.readValue(file, new TypeReference<List<Map<String, Object>>>() {
             });
@@ -58,11 +48,12 @@ public class SessionManager {
         } catch (IOException e) {
             System.err.println("Ошибка Cookies: " + e.getMessage());
         }
+        return this;
     }
 
-    private void loadLocalStorage() {
+    public SessionManager setLocalStorage() {
         File file = new File(STORAGE_FILE);
-        if (!file.exists()) return;
+        if (!file.exists()) return this;
         try {
             Map<String, String> storageData = mapper.readValue(file, new TypeReference<Map<String, String>>() {
             });
@@ -71,6 +62,7 @@ public class SessionManager {
         } catch (IOException e) {
             System.err.println("Ошибка Storage: " + e.getMessage());
         }
+        return this;
     }
 
     private void saveCookies() {
