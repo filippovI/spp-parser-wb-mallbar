@@ -10,7 +10,7 @@ import static com.codeborne.selenide.Selenide.$;
 @Getter
 @ToString
 public class MobileAuthPage {
-    public static final String PAGE_URL = "https://seller-auth.wildberries.ru/";
+    public static final String PAGE_URL = "https://seller-auth.wildberries.ru/ru/";
     public static final String WRITE_NUMBER_PHONE_LABEL = "//span[contains(text(), 'Введите номер телефона')]";
     public final SelenideElement writeNumberPhoneLabel = $(By.xpath(WRITE_NUMBER_PHONE_LABEL));
     public final SelenideElement numberPhoneInput = $(By.xpath("//input[@placeholder='999 999-99-99']"));
