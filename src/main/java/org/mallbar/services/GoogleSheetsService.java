@@ -35,7 +35,7 @@ public class GoogleSheetsService {
         this.searchColumn = searchColumn;
         this.updateColumn = updateColumn;
         this.sheetName = sheetName;
-        FileInputStream credentialsStream = new FileInputStream("src\\main\\resources\\credentials.json");
+        FileInputStream credentialsStream = new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
         GoogleCredentials credentials = ServiceAccountCredentials.fromStream(credentialsStream)
                 .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
         this.service = new Sheets.Builder(
