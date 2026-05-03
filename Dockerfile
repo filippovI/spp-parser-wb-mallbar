@@ -23,9 +23,18 @@ ENV TZ=Europe/Moscow \
     GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
 
 RUN addgroup -S app && adduser -S app -G app \
-    && apk add --no-cache tzdata \
-    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
-    && echo $TZ > /etc/timezone
+  && apk add --no-cache tzdata \
+  && mkdir -p /app/build/downloads /app/build/reports \
+  && chown -R app:app /app \
+  && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+  && echo $TZ > /etc/timezone
+
+WORKDIR /app
+
+COPY --from=builder /tmp/app.jar /app/app.jar
+
+USER app
+ENTRYPOINT ["/bin/sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
 
 WORKDIR /app
 COPY --from=builder /tmp/app.jar /app/app.jar
