@@ -1,9 +1,9 @@
-# Multi-stage Dockerfile for Maven + Java 17 + Chromium (Debian base)
+# Multi-stage Dockerfile for Maven + Java 17 + Chromium/Chromedriver on Debian (no Snap)
 # Stage 1: build JAR inside the image
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /src
 
-# Cache dependencies
+# Cache deps
 COPY pom.xml ./
 RUN --mount=type=cache,target=/root/.m2 mvn -B -q -DskipTests=true dependency:go-offline
 
@@ -14,18 +14,21 @@ RUN --mount=type=cache,target=/root/.m2 \
     JAR=$(ls target/*.jar | grep -v -E '(sources|javadoc|original)' | head -n1) && \
     echo "Artifact: $JAR" && cp "$JAR" /tmp/app.jar
 
-# Stage 2: runtime (Debian + JRE 17 + Chromium + Chromedriver)
-FROM eclipse-temurin:17-jre
+# Stage 2: runtime — Debian slim + OpenJDK 17 + Chromium + Chromedriver (APT), no Snap required
+FROM openjdk:17-jre-slim
 
 ENV TZ=Europe/Moscow \
-    JAVA_OPTS="-Djava.net.preferIPv4Stack=true -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dselenide.headless=true -Dselenide.downloadsFolder=/app/build/downloads -Dselenide.reportsFolder=/app/build/reports -Xms128m -Xmx512m -XX:+UseG1GC -XX:MaxRAMPercentage=75" \
-    GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
+    GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json" \
+    JAVA_OPTS="-Djava.net.preferIPv4Stack=true -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dselenide.browser=chrome -Dselenide.browserBinary=/usr/bin/chromium -Dselenide.headless=true -Dselenide.downloadsFolder=/app/build/downloads -Dselenide.reportsFolder=/app/build/reports -Xms128m -Xmx512m -XX:+UseG1GC -XX:MaxRAMPercentage=75"
 
-# Создаём пользователя и ставим браузер с драйвером (совместимые бинарники)
-RUN useradd -ms /bin/bash app \
+# Создаём пользователя и ставим всё нужное для Chromium
+RUN useradd -m -s /bin/sh app \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-         chromium chromium-driver fonts-liberation libnss3 ca-certificates tzdata \
+         chromium chromium-driver \
+         libnss3 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 \
+         libgtk-3-0 libatk-bridge2.0-0 libasound2 libxshmfence1 xdg-utils \
+         fonts-liberation fonts-noto-color-emoji tzdata ca-certificates \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
     && mkdir -p /app/build/downloads /app/build/reports \
@@ -34,10 +37,10 @@ RUN useradd -ms /bin/bash app \
 
 WORKDIR /app
 
-# Копируем собранный артефакт
+# Кладём собранный артефакт
 COPY --from=builder /tmp/app.jar /app/app.jar
 
-# Запускаемся под непривилегированным пользователем
+# Запускаем под непривилегированным пользователем
 USER app
 
 ENTRYPOINT ["/bin/sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
