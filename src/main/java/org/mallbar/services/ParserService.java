@@ -60,14 +60,14 @@ public class ParserService {
             //log
             System.out.println("Начат парсинг данных");
             bot.sendTextMessage(chatId, "Собираю данные");
-            int articleAndDiscountMapSize = 0;
+            int articleAndDiscountMapSize = -1;
             executeJavaScript("window.scrollBy(0, 1500)");
             while (true) {
                 try {
                     for (SelenideElement el : priceAndDiscountPage.getMainTable().$$x("./*")) {
                         SelenideElement nameCell = el.$x(ARTICLE_COLUMN);
                         SelenideElement percentCell = el.$x(PERCENT_COLUMN);
-                        if (!el.getText().isEmpty() && Arrays.asList(el.getText().split("\n")).size() > 12) {
+                        if (!el.getText().isEmpty() && Arrays.asList(el.getText().split("\n")).size() > 4) {
                             Matcher matcher = ARTICLE_PATTERN.matcher(nameCell.getText());
                             String percent = percentCell.getText().trim().contains("%") ? percentCell.getText().trim() : "0%";
                             if (matcher.find()) {
@@ -75,6 +75,7 @@ public class ParserService {
                             }
                         }
                     }
+                    System.out.println(articleAndDiscountMap);
                     if (articleAndDiscountMapSize == articleAndDiscountMap.size()) break;
                     articleAndDiscountMapSize = articleAndDiscountMap.size();
                     priceAndDiscountPage.spinPriceAndDiscountTable(1500);
@@ -96,11 +97,17 @@ public class ParserService {
             boolean updateState;
             updateState = updateColumn(chatId, parseData);
             if (updateState) {
+                //log
                 System.out.println("Таблица обновлена");
                 bot.sendTextMessage(chatId, "Таблица обновлена");
             } else {
+                //log
                 bot.sendTextMessage(chatId, "Ошибка при обновлении таблицы");
             }
+        } else {
+            //log
+            System.out.println("Нет данных на сайте WB");
+            bot.sendTextMessage(chatId, "Нет данных на сайте WB");
         }
     }
 }
