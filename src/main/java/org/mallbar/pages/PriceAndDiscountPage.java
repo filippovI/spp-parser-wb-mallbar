@@ -13,7 +13,7 @@ import static com.codeborne.selenide.Selenide.executeJavaScript;
 public class PriceAndDiscountPage {
     public static final String MAIN_TABLE = "//*[contains(@class, 'ant-table-tbody-virtual-holder-inner')]";
     public static final String SPIN_CONTAINER = "//*[contains(@class, 'ant-table-tbody-virtual-holder')]";
-    public static final String PAGE_URL = "https://seller.wildberries.ru/discount-and-prices/main-table/ru";
+    public static final String PAGE_URL = "https://seller.wildberries.ru/discount-and-prices/main-table/";
     public static final String ARTICLE_COLUMN = "./div[1]";
     public static final String PERCENT_COLUMN = "./div[7]";
     private final SelenideElement mainTable = $(By.xpath(MAIN_TABLE));
