@@ -62,7 +62,7 @@ public class AuthService {
             Selenide.sleep(2000);
             refresh();
             open(PriceAndDiscountPage.PAGE_URL);
-            $x(MobileAuthPage.WRITE_NUMBER_PHONE_LABEL + " | " + MainPage.MAIN_LOGO)
+            $x(MobileAuthPage.WRITE_NUMBER_PHONE_LABEL + " | " + MobileAuthPage.WRITE_NUMBER_PHONE_LABEL_ENG + " | " + MainPage.MAIN_LOGO)
                     .shouldBe(visible, Duration.ofSeconds(10));
             if (mainPage.getLogo().isDisplayed()) {
                 //log
