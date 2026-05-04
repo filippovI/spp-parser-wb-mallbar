@@ -56,6 +56,8 @@ public class ParserService {
         } else {
             PriceAndDiscountPage priceAndDiscountPage = new PriceAndDiscountPage();
             open(PriceAndDiscountPage.PAGE_URL);
+            priceAndDiscountPage.getAcceptCookieButton().shouldBe(visible, Duration.ofSeconds(10));
+            priceAndDiscountPage.clickAcceptCookieButton();
             priceAndDiscountPage.getMainTable().shouldBe(visible, Duration.ofSeconds(10));
             //log
             System.out.println("Начат парсинг данных");

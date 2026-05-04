@@ -16,10 +16,16 @@ public class PriceAndDiscountPage {
     public static final String PAGE_URL = "https://seller.wildberries.ru/discount-and-prices/main-table/";
     public static final String ARTICLE_COLUMN = "./div[1]";
     public static final String PERCENT_COLUMN = "./div[7]";
+    public static final String ACCEPT_COOKIE_BUTTON = "//span[contains(text(), 'Принимаю')]";
     private final SelenideElement mainTable = $(By.xpath(MAIN_TABLE));
     private final SelenideElement spinContainer = $(By.xpath(SPIN_CONTAINER));
+    private final SelenideElement acceptCookieButton = $(By.xpath(ACCEPT_COOKIE_BUTTON));
 
     public void spinPriceAndDiscountTable(int pixels) {
         executeJavaScript("arguments[0].scrollTop += " + pixels + ";", spinContainer);
+    }
+
+    public void clickAcceptCookieButton() {
+        acceptCookieButton.click();
     }
 }
