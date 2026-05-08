@@ -34,8 +34,6 @@ public class GoogleSheetsService {
     ));
 
     //WB unit БАЗА
-
-
     @SneakyThrows
     public GoogleSheetsService(String sheetName, String searchColumn, String updateColumn) {
         this.searchColumn = searchColumn;
