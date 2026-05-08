@@ -15,6 +15,8 @@ import lombok.SneakyThrows;
 import lombok.ToString;
 
 import java.io.FileInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Getter
@@ -26,6 +28,10 @@ public class GoogleSheetsService {
     private final String searchColumn;
     private final String updateColumn;
     private final String sheetName;
+    private final Path CREDS_PATH = Paths.get(System.getenv().getOrDefault(
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "/srv/keys/credentials.json"            // дефолт внутри контейнера
+    ));
 
     //WB unit БАЗА
 
@@ -35,7 +41,7 @@ public class GoogleSheetsService {
         this.searchColumn = searchColumn;
         this.updateColumn = updateColumn;
         this.sheetName = sheetName;
-        FileInputStream credentialsStream = new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
+        FileInputStream credentialsStream = new FileInputStream(CREDS_PATH.toFile());
         GoogleCredentials credentials = ServiceAccountCredentials.fromStream(credentialsStream)
                 .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
         this.service = new Sheets.Builder(

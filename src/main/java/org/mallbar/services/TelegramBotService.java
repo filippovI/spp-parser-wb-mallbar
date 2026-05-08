@@ -1,5 +1,6 @@
 package org.mallbar.services;
 
+import com.codeborne.selenide.Selenide;
 import lombok.Getter;
 import lombok.ToString;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -62,6 +63,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                             ex.printStackTrace();
                         } finally {
                             isParserRunning.set(false);
+                            Selenide.closeWebDriver();
                         }
                     }).start();
                 } else {

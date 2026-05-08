@@ -34,6 +34,8 @@ public class ParserService {
 
     private boolean updateColumn(long chatId, Map<String, String> updateData) {
         GoogleSheetsService googleSheetsService = new GoogleSheetsService("WB unit БАЗА", "A", "BH");
+        //log
+        System.out.println("Начинаю обновлять таблицу");
         bot.sendTextMessage(chatId, "Обновляю таблицу");
         return googleSheetsService.updateColumn(updateData);
     }
