@@ -82,7 +82,7 @@ public class ParserService {
                     System.out.println(articleAndDiscountMap);
                     if (articleAndDiscountMapSize == articleAndDiscountMap.size()) break;
                     articleAndDiscountMapSize = articleAndDiscountMap.size();
-                    priceAndDiscountPage.spinPriceAndDiscountTable(1500);
+                    priceAndDiscountPage.spinPriceAndDiscountTable(1000);
                     Selenide.sleep(1000);
                 } catch (Exception ex) {
                     //log
