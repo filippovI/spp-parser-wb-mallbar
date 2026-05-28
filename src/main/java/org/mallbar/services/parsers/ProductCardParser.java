@@ -1,5 +1,6 @@
 package org.mallbar.services.parsers;
 
+import com.codeborne.selenide.Selenide;
 import lombok.extern.slf4j.Slf4j;
 import org.mallbar.pages.ProductCardPage;
 
@@ -34,6 +35,7 @@ public class ProductCardParser {
                 System.out.println("Такого товара еще нет");
             } else {
                 System.out.println("Ошибка парсинга цены");
+                Selenide.screenshot("error_" + key);
             }
         }
         return articleAndPriceFromProductCard;
