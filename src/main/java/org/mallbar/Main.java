@@ -25,10 +25,9 @@ public class Main {
                         "--window-size=2560,1400",
                         "--force-device-scale-factor=0.33",
                         "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                        "--lang=ru"
+                        "--lang=ru",
+                        "--disable-blink-features=AutomationControlled"
                 );
-
-        Configuration.headless = true; // дубль для Selenide, но не мешает
         options.setExperimentalOption("excludeSwitches", java.util.List.of("enable-automation"));
         options.setExperimentalOption("useAutomationExtension", false);
         options.setExperimentalOption("prefs", java.util.Map.of("intl.accept_languages", "ru-RU,ru"));
