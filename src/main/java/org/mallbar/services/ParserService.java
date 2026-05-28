@@ -91,6 +91,8 @@ public class ParserService {
                     return Map.of();
                 }
             }
+            ProductCardParser productCardParser = new ProductCardParser();
+            productCardParser.parsePrice(articleAndDiscountMap);
         }
         return articleAndDiscountMap;
     }
