@@ -17,7 +17,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.executeJavaScript;
 import static com.codeborne.selenide.Selenide.open;
 import static org.mallbar.pages.PriceAndDiscountPage.ARTICLE_COLUMN;
-import static org.mallbar.pages.PriceAndDiscountPage.PERCENT_COLUMN;
+import static org.mallbar.pages.PriceAndDiscountPage.DISCOUNT_PRICE_COLUMN;
 
 @Getter
 @ToString
@@ -70,12 +70,12 @@ public class ParserService {
                 try {
                     for (SelenideElement el : priceAndDiscountPage.getMainTable().$$x("./*")) {
                         SelenideElement nameCell = el.$x(ARTICLE_COLUMN);
-                        SelenideElement percentCell = el.$x(PERCENT_COLUMN);
+                        SelenideElement priceCell = el.$x(DISCOUNT_PRICE_COLUMN);
                         if (!el.getText().isEmpty() && Arrays.asList(el.getText().split("\n")).size() > 4) {
                             Matcher matcher = ARTICLE_PATTERN.matcher(nameCell.getText());
-                            String percent = percentCell.getText().trim().contains("%") ? percentCell.getText().trim() : "0%";
+                            String price = priceCell.getText().trim().replaceAll("[\\s₽]", "");
                             if (matcher.find()) {
-                                articleAndDiscountMap.put(matcher.group().trim(), percent);
+                                articleAndDiscountMap.put(matcher.group().trim(), price);
                             }
                         }
                     }
