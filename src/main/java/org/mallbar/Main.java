@@ -34,22 +34,6 @@ public class Main {
         options.setExperimentalOption("prefs", java.util.Map.of("intl.accept_languages", "ru-RU,ru"));
         Configuration.browserCapabilities = options;
         TelegramBotService bot = TelegramBotService.init();
-
-
-        //TelegramBot bot = TelegramBot.init();
-//        Parser parser = new Parser();
-//        SessionManager sessionManager = new SessionManager();
-//        sessionManager.setCookieAndStorage();
-//        parser.parseArticleAndDiscount();
-        //GoogleSheetsService googleSheetsService = new GoogleSheetsService("WB Unit БАЗА", "A", "H");
-//        sleep(1000);
-//        Map<String, String> result = parser.parseArticleAndDiscount();
-//        System.out.println(result);
-//        Map<String, String> result = new HashMap<>() {{
-//            put("195029270", "99%"); //34
-//
-//        }};
-//        googleSheetsService.updatePercent(result);
     }
 }
 

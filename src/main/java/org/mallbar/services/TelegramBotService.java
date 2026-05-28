@@ -3,6 +3,7 @@ package org.mallbar.services;
 import com.codeborne.selenide.Selenide;
 import lombok.Getter;
 import lombok.ToString;
+import org.mallbar.services.parsers.ParserService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
