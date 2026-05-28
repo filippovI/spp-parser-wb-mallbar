@@ -25,7 +25,7 @@ public class SessionManager {
     );
     private static final Path COOKIES_FILE = SESSION_DIR.resolve("wb_seller_cookies.json");
     private static final Path STORAGE_FILE = SESSION_DIR.resolve("wb_local_storage.json");
-    public static final String SESSION_URL = "https://seller.wildberries.ru/";
+    public static final String SESSION_URL = "https://seller.wildberries.ru/about-portal/ru/ru";
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void saveCookieAndStorage() {
