@@ -50,7 +50,6 @@ RUN mkdir -p /app/creds /app/browser_data
 # Переменные окружения по умолчанию
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/creds/credentials.json \
     BROWSER_DATA_DIR=/app/browser_data \
-    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -Dfile.encoding=UTF-8 -Dselenide.headless=true" \
-    TELEGRAM_TOKEN=8513691300:AAEGP1RhZBK-p0To4ctdVtyYgZ07qWAJtdE
+    JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -Dfile.encoding=UTF-8 -Dselenide.headless=true"
 
 ENTRYPOINT ["java","-jar","/app/app.jar"]

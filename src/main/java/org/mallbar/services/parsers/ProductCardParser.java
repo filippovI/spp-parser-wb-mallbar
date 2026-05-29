@@ -30,6 +30,8 @@ public class ProductCardParser {
                     String price = productCardPage.getPriceWithoutWbWallet().getText().replaceAll("[\\s₽]", "");
                     articleAndPriceFromProductCard.put(key, price);
                     System.out.println(" - " + price);
+                } else {
+                    System.out.println();
                 }
             } else if (productCardPage.getErrorPage().is(visible, Duration.ofSeconds(10))) {
                 System.out.println("Такого товара еще нет");

@@ -48,7 +48,7 @@ public class PriceLkParser {
                     if (!el.getText().isEmpty() && Arrays.asList(el.getText().split("\n")).size() > 4) {
                         Matcher matcher = ARTICLE_PATTERN.matcher(nameCell.getText());
                         String price = priceCell.getText().trim().replaceAll("[\\s₽]", "");
-                        if (matcher.find()) {
+                        if (matcher.find() && !price.isEmpty()) {
                             String art = matcher.group().trim();
                             articleAndDiscountMap.put(art, price);
                             System.out.println("Нашел цену со скидкой для " + art + " - " + price);
@@ -58,7 +58,7 @@ public class PriceLkParser {
 
                 if (articleAndDiscountMapSize == articleAndDiscountMap.size()) break;
                 articleAndDiscountMapSize = articleAndDiscountMap.size();
-                priceAndDiscountPage.spinPriceAndDiscountTable(1000);
+                priceAndDiscountPage.spinPriceAndDiscountTable(800);
                 Selenide.sleep(1000);
             } catch (Exception ex) {
                 //log

@@ -1,14 +1,9 @@
 package org.mallbar;
 
-import com.codeborne.selenide.Config;
 import com.codeborne.selenide.Configuration;
 import lombok.SneakyThrows;
 import org.mallbar.services.TelegramBotService;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import java.util.Collections;
-
-import static com.codeborne.selenide.Selenide.open;
 
 public class Main {
 
